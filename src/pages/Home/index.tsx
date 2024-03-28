@@ -1,5 +1,7 @@
 import { Play } from 'phosphor-react'
-import React from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import zod from 'zod'
 import {
   CountDownButton,
   CountdownContainer,
@@ -11,12 +13,21 @@ import {
 } from './styles'
 
 function Home() {
+  const { register, handleSubmit, watch } = useForm()
+  const task = watch('task')
+
+  function handleCreateNewCycle() {}
+
   return (
     <HomeContainer>
-      <form action="">
+      <form onSubmit={handleSubmit(handleCreateNewCycle)} action="">
         <FormContainer>
           <label htmlFor="task">Vou trabalhar em</label>
-          <TaskInput placeholder="De um nome para seu projeto" id="task" />
+          <TaskInput
+            placeholder="De um nome para seu projeto"
+            id="task"
+            {...register('task')}
+          />
 
           <label htmlFor="minutesAmount">durante</label>
           <MinutesAmountInput
@@ -25,6 +36,7 @@ function Home() {
             max={5}
             placeholder="00"
             id="minutesAmount"
+            {...register('minutesAmount', { valueAsNumber: true })}
           />
 
           <span>minutos</span>
@@ -37,7 +49,7 @@ function Home() {
           <span>0</span>
         </CountdownContainer>
 
-        <CountDownButton type="submit">
+        <CountDownButton disabled={!task} type="submit">
           <Play />
           Começar{' '}
         </CountDownButton>
