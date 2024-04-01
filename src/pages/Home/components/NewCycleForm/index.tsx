@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import * as zod from 'zod'
 import { FormContainer, MinutesAmountInput, TaskInput } from './styles'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { CyclesContext } from '../..'
 
 const newCycleFormSchema = zod.object({
   task: zod.string().min(1, 'Informe a tarefa'),
@@ -10,6 +11,7 @@ const newCycleFormSchema = zod.object({
 })
 
 type NewCycleFormData = zod.infer<typeof newCycleFormSchema>
+
 export default function NewCycleForm() {
   const { register, handleSubmit, watch, reset } = useForm<NewCycleFormData>({
     resolver: zodResolver(newCycleFormSchema),
@@ -18,6 +20,37 @@ export default function NewCycleForm() {
       minutesAmount: 0
     }
   })
+  const { activeCycle, activeCycleId } = useContext(CyclesContext)
+
+  const task = watch('task')
+
+  function handleCreateNewCycle(data: NewCycleFormData) {
+    const newCycle: Cycle = {
+      id: String(new Date().getTime()),
+      minutesAmount: data.minutesAmount,
+      task: data.task,
+      startDate: new Date()
+    }
+
+    setCycles(state => [...state, newCycle])
+    setActiveCycleId(newCycle.id)
+    setAmountSecondsPassed(0)
+    reset()
+  }
+
+  function handleInterruptCycle() {
+    setActiveCycleId(null)
+
+    setCycles(
+      cycles.map(cycle => {
+        if (cycle.id === activeCycleId) {
+          return { ...cycle, interrupedDate: new Date() }
+        } else {
+          return cycle
+        }
+      })
+    )
+  }
 
   return (
     <FormContainer>

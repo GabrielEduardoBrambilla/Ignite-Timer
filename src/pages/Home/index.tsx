@@ -6,7 +6,7 @@ import {
   StartCountDownButton,
   StopCountDownButton
 } from './styles'
-import { useEffect, useState } from 'react'
+import { createContext, useEffect, useState } from 'react'
 import NewCycleForm from './components/NewCycleForm'
 import CountDown from './components/Countdown'
 
@@ -19,43 +19,24 @@ interface Cycle {
   finishedDate?: Date
 }
 
+interface CyclesContextType {
+  activeCycle: Cycle | undefined
+  activeCycleId: string | null
+  markCurrentCycleAsFinished: () => void
+}
+
+export const CyclesContext = createContext({} as CyclesContextType)
+
 function Home() {
   const [cycles, setCycles] = useState<Cycle[]>([])
-
   const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
-  const task = watch('task')
-
   const activeCycle = cycles.find(cycle => cycle.id === activeCycleId)
 
-  const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0
-
-  const minutesAmount = Math.floor(currentSeconds / 60)
-  const secondsAmount = currentSeconds % 60
-
-  const minutes = String(minutesAmount).padStart(2, '0')
-  const seconds = String(secondsAmount).padStart(2, '0')
-
-  function handleCreateNewCycle(data: NewCycleFormData) {
-    const newCycle: Cycle = {
-      id: String(new Date().getTime()),
-      minutesAmount: data.minutesAmount,
-      task: data.task,
-      startDate: new Date()
-    }
-
-    setCycles(state => [...state, newCycle])
-    setActiveCycleId(newCycle.id)
-    setAmountSecondsPassed(0)
-    reset()
-  }
-
-  function handleInterruptCycle() {
-    setActiveCycleId(null)
-
-    setCycles(
-      cycles.map(cycle => {
+  function markCurrentCycleAsFinished() {
+    setCycles(state =>
+      state.map(cycle => {
         if (cycle.id === activeCycleId) {
-          return { ...cycle, interrupedDate: new Date() }
+          return { ...cycle, finishedDate: new Date() }
         } else {
           return cycle
         }
@@ -63,15 +44,15 @@ function Home() {
     )
   }
 
-  useEffect(() => {
-    if (activeCycle) document.title = `${minutes}:${seconds}`
-  }, [minutes, seconds, activeCycle])
-
   return (
     <HomeContainer>
       <form onSubmit={handleSubmit(handleCreateNewCycle)} action="">
-        <NewCycleForm />
-        <CountDown />
+        <CyclesContext.Provider
+          value={{ activeCycle, activeCycleId, markCurrentCycleAsFinished }}
+        >
+          <NewCycleForm />
+          <CountDown />
+        </CyclesContext.Provider>
 
         {activeCycle ? (
           <StopCountDownButton disabled={!task} type="button">
