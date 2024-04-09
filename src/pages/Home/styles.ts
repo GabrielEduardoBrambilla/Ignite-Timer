@@ -12,11 +12,12 @@ export const HomeContainer = styled.main`
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2.5rem;
+    gap: 3.5rem;
   }
 `
 
 export const BaseCountDownButton = styled.button`
+  width: 100%;
   border: 0;
   padding: 1rem;
   border-radius: 8px;
@@ -24,12 +25,12 @@ export const BaseCountDownButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
+  color: ${props => props.theme['gray-100']};
 
   gap: 0.5rem;
   font-weight: bold;
 
   cursor: pointer;
-  color: ${props => props.theme['gray-100']};
 
   &:disabled {
     opacity: 0.7;
@@ -38,6 +39,7 @@ export const BaseCountDownButton = styled.button`
 `
 export const StartCountDownButton = styled(BaseCountDownButton)`
   background-color: ${props => props.theme['green-500']};
+  color: ${props => props.theme['gray-100']};
   &:not(:disabled):hover {
     background-color: ${props => props.theme['green-700']};
   }

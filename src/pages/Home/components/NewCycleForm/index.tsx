@@ -23,12 +23,13 @@ export default function NewCycleForm() {
         min={5}
         max={5}
         placeholder="00"
+        type="number"
         id="minutesAmount"
         disabled={!!activeCycle}
         {...register('minutesAmount', { valueAsNumber: true })}
       />
 
-      <span>minutos</span>
+      <span>minutos.</span>
     </FormContainer>
   )
 }
